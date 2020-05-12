@@ -242,6 +242,9 @@ type MetaTypeFromRenderer = {
   id: number,
   location: string,
   length: number
+} | {
+  type: 'nativeimage',
+  value: { size: number, buffer: Buffer }
 }
 
 const fakeConstructor = (constructor: Function, name: string) =>
@@ -259,6 +262,8 @@ const fakeConstructor = (constructor: Function, name: string) =>
 const unwrapArgs = function (sender: electron.WebContents, frameId: number, contextId: string, args: any[]) {
   const metaToValue = function (meta: MetaTypeFromRenderer): any {
     switch (meta.type) {
+      case 'nativeimage':
+        return electron.nativeImage.createFromBitmap(meta.value.buffer, meta.value.size as any);
       case 'value':
         return meta.value;
       case 'remote-object':
